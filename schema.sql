@@ -16,7 +16,7 @@ CREATE TABLE invoices(
 );
 
 CREATE TABLE invoice_item(
-    item_id INTEGER NOT NULL UNIQUE,
+    item_id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT,
     invoice_id INTEGER NOT NULL,
     item_name TEXT NOT NULL,
     item_count INTEGER NOT NULL,
