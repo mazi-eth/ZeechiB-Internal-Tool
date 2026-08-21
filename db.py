@@ -74,15 +74,11 @@ def get_invoice_items(invoice_id):
     ).fetchall()
 
     #route call will do the unwrapping
-
     conn.close()
 
     return invoice_rows
 
     
-
-    
-
 #get_invoice_balance(invoice_id)
 def get_invoice_balance(invoice_id):
     conn = connect_db()
@@ -109,6 +105,25 @@ def get_invoice_balance(invoice_id):
       
 
 #get_invoices_for_outlet(outlet_name)
+def get_invoices_for_outlet(outlet_name):
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    outlet_id = cursor.execute(
+        "SELECT id FROM outlets WHERE outlet_name = ?", (outlet_name,)
+    ).fetchone()
+    if outlet_id is None:
+        return None
+
+    # Extract outletID
+    outlet_id = outlet_id [0]
+
+    invoices = cursor.execute(
+        "SELECT * FROM invoices WHERE outlet_id = ?", (outlet_id,)
+    ).fetchall()
+    conn.close()
+    return invoices
+
   
 
 
