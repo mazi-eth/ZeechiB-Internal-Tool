@@ -65,6 +65,23 @@ def add_payment(invoice_id, amount):
     conn.close()
 
 #get_invoice_items(invoice_id)
+def get_invoice_items(invoice_id):
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    invoice_rows = cursor.execute (
+        "SELECT item_name, item_count, unit_price, line_total FROM invoice_item WHERE invoice_id = ?", (invoice_id, )
+    ).fetchall()
+
+    #route call will do the unwrapping
+
+    conn.close()
+
+    return invoice_rows
+
+    
+
+    
 
 #get_invoice_balance(invoice_id)
 def get_invoice_balance(invoice_id):
