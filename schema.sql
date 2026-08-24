@@ -7,7 +7,6 @@ CREATE TABLE outlets(
     contact_person_number TEXT NOT NULL
 );
 
-
 CREATE TABLE invoices(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     outlet_id INTEGER NOT NULL,
@@ -31,3 +30,12 @@ CREATE TABLE payments(
     timestamp INTEGER NOT NULL,
     FOREIGN KEY(invoice_id) REFERENCES invoices(id)
 ); 
+
+CREATE TABLE bookings(
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    customer_name TEXT NOT NULL,
+    customer_number TEXT NOT NULL,
+    booking_date TEXT NOT NULL,
+    booking_time TEXT,
+    amount INTEGER NOT NULL,
+)

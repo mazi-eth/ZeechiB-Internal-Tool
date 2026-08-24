@@ -77,8 +77,7 @@ def get_invoice_items(invoice_id):
     conn.close()
 
     return invoice_rows
-
-    
+   
 #get_invoice_balance(invoice_id)
 def get_invoice_balance(invoice_id):
     conn = connect_db()
@@ -124,13 +123,61 @@ def get_invoices_for_outlet(outlet_name):
     conn.close()
     return invoices
 
-  
-
-
-
-
-
-
 #get_unpaid_invoices
+def get_unpaid_invoices():
+    conn = connect_db()
+    cursor = conn.cursor()
 
+    invoices = cursor.execute(
+        "SELECT id, outlet_id, timestamp FROM invoices"
+    ).fetchall()
+    conn.close ()
+    unpaid_invoices = []
+
+    for invoice in invoices:
+        invoice_id = invoice[id]
+        balance = get_invoice_balance(invoice_id)
+
+        if balance > 0:
+            unpaid_invoices.append(invoice)
+    return unpaid_invoices
+    
 #get_monthly_totals(month, year)
+def get_monthly_totals(month, year):
+    conn = connect_db()
+    cursor = conn.cursor()
+    monthly_total = cursor.execute(
+        """
+        SELECT SUM(invoice_item.line_total)
+        FROM invoice_item
+        JOIN invoices
+        ON invoice_item.invoice_id = invoices.id
+        WHERE strftime('%m', invoices.timestamp) = ?
+        AND strftime('%Y', invoices.timestamp) = ?
+        """,
+        (f"{month:02d}", str(year))
+    ).fetchone()
+
+    conn.close()
+    if monthly_total[0] is None:
+        return 0
+    return monthly_total[0]
+
+#get_monthly_payments(month, year)
+def get_monthly_payments(month, year):
+    conn = connect_db()
+    cursor = conn.cursor()
+    monthly_payment = cursor.execute(
+        """
+        SELECT SUM(amount)
+        FROM payments
+        WHERE strftime('%m', invoices.timestamp) = ?
+        AND strftime('%Y', invoices.timestamp) = ?
+        """,
+        (f"{month:02d}", str(year))
+    ).fetchone()
+
+    conn.close()
+    if monthly_payment[0] is None:
+        return 0
+    return monthly_payment[0]
