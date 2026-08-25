@@ -25,10 +25,12 @@ CREATE TABLE invoice_item(
 );
 
 CREATE TABLE payments(
-    invoice_id INTEGER NOT NULL,
+    invoice_id INTEGER,
+    booking_id INTEGER,
     amount INTEGER NOT NULL,
     timestamp INTEGER NOT NULL,
     FOREIGN KEY(invoice_id) REFERENCES invoices(id)
+    FOREIGN KEY(booking_id) REFERENCES bookings(id)
 ); 
 
 CREATE TABLE bookings(
@@ -38,4 +40,5 @@ CREATE TABLE bookings(
     booking_date TEXT NOT NULL,
     booking_time TEXT,
     amount INTEGER NOT NULL,
+    description TEXT NOT NULL
 )
