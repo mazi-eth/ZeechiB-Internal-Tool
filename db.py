@@ -171,8 +171,8 @@ def get_monthly_payments(month, year):
         """
         SELECT SUM(amount)
         FROM payments
-        WHERE strftime('%m', invoices.timestamp) = ?
-        AND strftime('%Y', invoices.timestamp) = ?
+        WHERE strftime('%m',timestamp) = ?
+        AND strftime('%Y',timestamp) = ?
         """,
         (f"{month:02d}", str(year))
     ).fetchone()
