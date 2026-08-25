@@ -135,7 +135,7 @@ def get_unpaid_invoices():
     unpaid_invoices = []
 
     for invoice in invoices:
-        invoice_id = invoice[id]
+        invoice_id = invoice[0]
         balance = get_invoice_balance(invoice_id)
 
         if balance > 0:
