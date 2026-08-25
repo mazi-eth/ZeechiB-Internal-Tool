@@ -181,3 +181,5 @@ def get_monthly_payments(month, year):
     if monthly_payment[0] is None:
         return 0
     return monthly_payment[0]
+    
+    #TODO: add booking payment , add booking , get booking balance
