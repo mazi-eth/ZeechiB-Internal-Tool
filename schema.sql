@@ -29,7 +29,7 @@ CREATE TABLE payments(
     booking_id INTEGER,
     amount INTEGER NOT NULL,
     timestamp INTEGER NOT NULL,
-    FOREIGN KEY(invoice_id) REFERENCES invoices(id)
+    FOREIGN KEY(invoice_id) REFERENCES invoices(id),
     FOREIGN KEY(booking_id) REFERENCES bookings(id)
 ); 
 
@@ -38,7 +38,6 @@ CREATE TABLE bookings(
     customer_name TEXT NOT NULL,
     customer_number TEXT NOT NULL,
     booking_date TEXT NOT NULL,
-    booking_time TEXT,
     amount INTEGER NOT NULL,
     description TEXT NOT NULL
-)
+);

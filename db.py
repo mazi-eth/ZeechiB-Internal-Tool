@@ -1,6 +1,5 @@
 import sqlite3
 
-
 #open a database connection
 def connect_db():
     conn = sqlite3.connect("zeechib.db")
@@ -9,7 +8,6 @@ def connect_db():
 #add an outlet
 def add_outlet(name, contact_person, contact_number):
     conn = connect_db()
-
     #Database cursor object for executing SQL.
     cursor = conn.cursor()
     cursor.execute(
@@ -18,12 +16,22 @@ def add_outlet(name, contact_person, contact_number):
     conn.commit()
     conn.close()
 
+#add_booking, return booking ID
+def add_booking(name, number, date, amount, description):
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO bookings (customer_name, customer_number, booking_date, amount, description) VALUES(?, ?, ?, ?, ?)", (name, number, date, amount, description)
+    )
+    conn.commit()
+    booking_id = cursor.lastrowid
+    conn.close()
+    return booking_id
+
 #add_invoice, return invoice ID
 def add_invoice(outlet_name):
     conn = connect_db()
-
     cursor = conn.cursor()
-
     outlet_id = cursor.execute(
         "SELECT id FROM outlets WHERE outlet_name = ?", (outlet_name,)
     ).fetchone()
@@ -43,23 +51,29 @@ def add_invoice(outlet_name):
 #add_invoice_item(invoice ID, item name, count, unit_price)
 def add_invoice_item(invoice_id, item_name, item_count, unit_price):
     conn = connect_db()
-
     cursor = conn.cursor()
-
     cursor.execute(
         "INSERT INTO invoice_item (invoice_id, item_name, item_count, unit_price, line_total) VALUES (?, ?, ?, ?, ?)", (invoice_id, item_name,  item_count, unit_price, (item_count * unit_price))
     )
     conn.commit()
     conn.close()
 
-#add_payment(invoice ID, amount, timestamp)
-def add_payment(invoice_id, amount):
+#add_invoice_payment(invoice ID, amount, timestamp)
+def add_invoice_payment(invoice_id, amount):
     conn = connect_db()
-
     cursor = conn.cursor()
-
     cursor.execute(
         "INSERT INTO payments (invoice_id, amount, timestamp) VALUES (?, ?, date('now'))", (invoice_id, amount)
+    )
+    conn.commit()
+    conn.close()
+
+#add_booking_payment(booking_id, amount, timestamp)
+def add_booking_payment(booking_id, amount):
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO payments (booking_id, amount, timestamp) VALUES (?,?, date('now'))", (booking_id, amount)
     )
     conn.commit()
     conn.close()
@@ -68,31 +82,57 @@ def add_payment(invoice_id, amount):
 def get_invoice_items(invoice_id):
     conn = connect_db()
     cursor = conn.cursor()
-
     invoice_rows = cursor.execute (
         "SELECT item_name, item_count, unit_price, line_total FROM invoice_item WHERE invoice_id = ?", (invoice_id, )
     ).fetchall()
-
     #route call will do the unwrapping
     conn.close()
-
     return invoice_rows
+
+#get_booking()
+def get_bookings():
+    conn = connect_db()
+    cursor = conn.cursor()
+    bookings = cursor.execute(
+        "SELECT * FROM bookings"
+    ).fetchall
+    conn.close()
+    return bookings
+
+#get_booking_balance
+def get_booking_balance(id):
+    conn = connect_db()
+    cursor = conn.cursor()
+    total_booked = cursor.execute(
+        "SELECT SUM(amount) FROM bookings WHERE id = ?", (id, )
+    ).fetchone()
+    total_booked = total_booked[0]
+    total_booking_payment = cursor.execute(
+        "SELECT SUM(amount) FROM payments WHERE booking_id = ?", (id, )
+    ).fetchone()
+    total_booking_payment = total_booking_payment[0]
+
+    if total_booked is None:
+        total_booked = 0
+    if total_booking_payment is None:
+        total_booking_payment = 0
+    balance = total_booked - total_booking_payment
+
+    return balance
+
    
 #get_invoice_balance(invoice_id)
 def get_invoice_balance(invoice_id):
     conn = connect_db()
     cursor = conn.cursor()
-
     total_invoiced = cursor.execute (
         "SELECT SUM(line_total) FROM invoice_item WHERE invoice_id = ?", (invoice_id, )
     ).fetchone()
     total_invoiced = total_invoiced[0]
-
     total_payment = cursor.execute (
         "SELECT SUM(amount) FROM payments WHERE invoice_id = ?", (invoice_id, )
     ).fetchone()
     total_payment = total_payment [0]
-
     conn.close()
 
     if total_invoiced is None:
@@ -102,18 +142,16 @@ def get_invoice_balance(invoice_id):
     balance = total_invoiced - total_payment
     return balance
       
-
 #get_invoices_for_outlet(outlet_name)
 def get_invoices_for_outlet(outlet_name):
     conn = connect_db()
     cursor = conn.cursor()
-
     outlet_id = cursor.execute(
         "SELECT id FROM outlets WHERE outlet_name = ?", (outlet_name,)
     ).fetchone()
+
     if outlet_id is None:
         return None
-
     # Extract outletID
     outlet_id = outlet_id [0]
 
@@ -127,7 +165,6 @@ def get_invoices_for_outlet(outlet_name):
 def get_unpaid_invoices():
     conn = connect_db()
     cursor = conn.cursor()
-
     invoices = cursor.execute(
         "SELECT id, outlet_id, timestamp FROM invoices"
     ).fetchall()
@@ -157,7 +194,6 @@ def get_monthly_totals(month, year):
         """,
         (f"{month:02d}", str(year))
     ).fetchone()
-
     conn.close()
     if monthly_total[0] is None:
         return 0
@@ -176,10 +212,9 @@ def get_monthly_payments(month, year):
         """,
         (f"{month:02d}", str(year))
     ).fetchone()
-
     conn.close()
     if monthly_payment[0] is None:
         return 0
     return monthly_payment[0]
-    
-    #TODO: add booking payment , add booking , get booking balance
+
+
