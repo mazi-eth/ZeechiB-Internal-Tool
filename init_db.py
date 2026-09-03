@@ -8,4 +8,5 @@ tables = conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'").fet
 
 print("Tables created: ", tables)
 
+conn.commit()
 conn.close()

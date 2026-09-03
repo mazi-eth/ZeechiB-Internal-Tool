@@ -1,5 +1,13 @@
 --Database Schema
 
+CREATE TABLE users(
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    firstname TEXT NOT NULL,
+    lastname TEXT NOT NULL,
+    username TEXT NOT NULL,
+    hash TEXT NOT NULL,
+)
+
 CREATE TABLE outlets(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     outlet_name TEXT NOT NULL,
@@ -10,7 +18,7 @@ CREATE TABLE outlets(
 CREATE TABLE invoices(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     outlet_id INTEGER NOT NULL,
-    timestamp INTEGER NOT NULL,
+    timestamp TEXT NOT NULL,
     FOREIGN KEY(outlet_id) REFERENCES outlets(id)
 );
 
@@ -28,7 +36,7 @@ CREATE TABLE payments(
     invoice_id INTEGER,
     booking_id INTEGER,
     amount INTEGER NOT NULL,
-    timestamp INTEGER NOT NULL,
+    timestamp TEXT NOT NULL,
     FOREIGN KEY(invoice_id) REFERENCES invoices(id),
     FOREIGN KEY(booking_id) REFERENCES bookings(id)
 ); 

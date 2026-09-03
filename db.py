@@ -95,7 +95,7 @@ def get_bookings():
     cursor = conn.cursor()
     bookings = cursor.execute(
         "SELECT * FROM bookings"
-    ).fetchall
+    ).fetchall()
     conn.close()
     return bookings
 
@@ -111,6 +111,7 @@ def get_booking_balance(id):
         "SELECT SUM(amount) FROM payments WHERE booking_id = ?", (id, )
     ).fetchone()
     total_booking_payment = total_booking_payment[0]
+    conn.close()
 
     if total_booked is None:
         total_booked = 0
